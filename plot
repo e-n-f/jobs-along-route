@@ -45,6 +45,11 @@ while (<IN>) {
 }
 close(IN);
 
+$along = 0;
+@wheres = ();
+%jobs_here = ();
+%homes_here = ();
+
 for ($i = 0; $i < $#seglat; $i++) {
 	for ($p = 0; $p < $len[$i]; $p += $step) {
 		$lat = $seglat[$i] * (1 - ($p / $len[$i])) + $seglat[$i + 1] * ($p / $len[$i]);
@@ -53,8 +58,7 @@ for ($i = 0; $i < $#seglat; $i++) {
 		$ilat = int($lat / $bucket);
 		$ilon = int($lon / $bucket);
 
-		%jobs_here = ();
-		%homes_here = ();
+		push @wheres, $along + $p;
 
 		for ($aa = $ilat - 1; $aa <= $ilat + 1; $aa++) {
 			for ($oo = $ilon - 2; $oo <= $ilon + 2; $oo++) {
@@ -67,17 +71,62 @@ for ($i = 0; $i < $#seglat; $i++) {
 
 					for $check (1320, 2640, 5280, 2 * 5280) {
 						if ($d < $check) {
-							$jobs_here{$check} += $jobs{$b[$j]};
-							$homes_here{$check} += $homes{$b[$j]};
+							$jobs_here{$along + $p}{$check} += $jobs{$b[$j]};
+							$homes_here{$along + $p}{$check} += $homes{$b[$j]};
 						}
 					}
 				}
 			}
 		}
 
-		for $check (1320, 2640, 5280, 2 * 5280) {
-			printf("%d %d ", $jobs_here{$check}, $homes_here{$check});
+		if (0) {
+			printf("%d ", $along + $p);
+			for $check (1320, 2640, 5280, 2 * 5280) {
+				printf("%d %d ", $jobs_here{$along + $p}{$check}, $homes_here{$along + $p}{$check});
+			}
+			printf("\n");
 		}
-		printf("\n");
+	}
+
+	$along += $len[$i];
+}
+
+%jobcolors = (
+	2 * 5280 => [ 251, 205, 171 ],
+	5280 => [ 255, 151, 86 ],
+	2640 => [ 252, 103, 1 ],
+	1320 => [ 171, 68, 2 ],
+);
+%homecolors = (
+	2 * 5280 => [ 215, 226, 244 ],
+	5280 => [ 134, 169, 223 ],
+	2640 => [ 54, 115, 195 ],
+	1320 => [ 35, 66, 121 ],
+);
+
+for $check (2 * 5280, 5280, 2640, 1320) {
+	for ($jh = 0; $jh < 2; $jh++) {
+		if ($jh == 0) {
+			@color = @{$jobcolors{$check}};
+		} else {
+			@color = @{$homecolors{$check}};
+		}
+
+		printf("%f %f %f setrgbcolor\n", $color[0] / 255, $color[1] / 255, $color[2] / 255);
+
+		print "newpath\n";
+		print "306 792 moveto\n";
+
+		for $where (@wheres) {
+			if ($jh == 0) {
+				$x = 306 - $jobs_here{$where}{$check} * 306 / 250000;
+			} else {
+				$x = 306 + $jobs_here{$where}{$check} * 306 / 250000;
+			}
+
+			printf("%f %f lineto\n", $x, 792 - 792 * $where / $along);
+		}
+
+		print "306 0 lineto closepath fill\n";
 	}
 }
