@@ -104,6 +104,20 @@ for ($i = 0; $i < $#seglat; $i++) {
 	1320 => [ 35, 66, 121 ],
 );
 
+print "0 setlinewidth";
+print "/Helvetica-Bold findfont 10 scalefont setfont\n";
+
+for $x (250000, 200000, 150000, 100000, 50000) {
+	printf("%f %f moveto %f %f lineto stroke\n",
+		306 - 306 * $x / 250000, 0, 
+		306 - 306 * $x / 250000, 792);
+	printf("%f %f moveto %f %f lineto stroke\n",
+		306 + 306 * $x / 250000, 0, 
+		306 + 306 * $x / 250000, 792);
+
+	printf("%f %f moveto ( %s) show\n", 306 + 306 * $x / 250000, 20, $x);
+}
+
 for $check (2 * 5280, 5280, 2640, 1320) {
 	for ($jh = 0; $jh < 2; $jh++) {
 		if ($jh == 0) {

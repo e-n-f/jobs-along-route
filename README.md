@@ -28,5 +28,5 @@ Calculate and plot
 ```
 cat ironhorse.json | ./plot > out.ps
 ps2pdf out.ps
-gs -sDEVICE=png16m -sOutputFile=out.png -dBATCH -dNOPAUSE -r150x150 -dGraphicsAlphaBits=4 out.pdf
+gs -sDEVICE=png16m -sOutputFile=out.png -dBATCH -dNOPAUSE -r150x150 -dGraphicsAlphaBits=4 -dTextAlphaBits=4 out.pdf
 ```
