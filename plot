@@ -121,7 +121,7 @@ for $check (2 * 5280, 5280, 2640, 1320) {
 			if ($jh == 0) {
 				$x = 306 - $jobs_here{$where}{$check} * 306 / 250000;
 			} else {
-				$x = 306 + $jobs_here{$where}{$check} * 306 / 250000;
+				$x = 306 + $homes_here{$where}{$check} * 306 / 250000;
 			}
 
 			printf("%f %f lineto\n", $x, 792 - 792 * $where / $along);
