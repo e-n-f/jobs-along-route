@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+open(IN, "unzip -p ca2010.pl.zip cageo2010.pl |");
+while (<IN>) {
+	$level = substr($_, 8, 3);
+	$lat = substr($_, 336, 11);
+	$lon = substr($_, 347, 12);
+	$land = substr($_, 198, 14) + 0;
+	$water = substr($_, 212, 14) + 0;
+	$name = substr($_, 226, 90);
+	$recno = substr($_, 18, 7);
+
+	$state = substr($_, 27, 2);
+	$county = substr($_, 29, 3);
+	$tract = substr($_, 54, 6);
+	$blockg = substr($_, 60, 1);
+	$block = substr($_, 61, 4);
+
+	if ($level == 750) {
+		$lat{"$state$county$tract$block"} = $lat;
+		$lon{"$state$county$tract$block"} = $lon;
+	}
+}
+close(IN);
+
+open(IN, "gzip -dc ca_rac_S000_JT00_2015.csv.gz |");
+while (<IN>) {
+	@fields = split(/,/, $_);
+	if (!defined($lat{$fields[0]})) {
+		print STDERR "Can't find geometry for $fields[0]\n";
+	}
+	$homes{$fields[0]} = $fields[1];
+}
+close(IN);
+
+open(IN, "gzip -dc ca_wac_S000_JT00_2015.csv.gz |");
+while (<IN>) {
+	@fields = split(/,/, $_);
+	if (!defined($lat{$fields[0]})) {
+		print STDERR "Can't find geometry for $fields[0]\n";
+	}
+	$jobs{$fields[0]} = $fields[1];
+}
+close(IN);
+
+for $block (keys(%lat)) {
+	if ($homes{$block} > 0 || $jobs{$block} > 0) {
+		printf("%s %f %f %d %d\n", $block, $lat{$block}, $lon{$block}, $homes{$block}, $jobs{$block});
+	}
+}
