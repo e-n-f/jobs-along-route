@@ -1,7 +1,9 @@
 jobs-along-route
 ================
 
-Download LODES for california:
+In the style of http://caltrain-hsr.blogspot.com/2013/10/census-driven-service-planning.html
+
+Download LODES for California:
 
 ```
 curl -L -O https://lehd.ces.census.gov/data/lodes/LODES7/ca/rac/ca_rac_S000_JT00_2015.csv.gz
