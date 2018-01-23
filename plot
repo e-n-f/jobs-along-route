@@ -3,7 +3,7 @@
 $pi = 4 * atan2(1, 1);
 $foot = .00000274;
 $bucket = 2 * 5280 * $foot;
-$step = 100;
+$step = 200;
 
 while (<STDIN>) {
 	$geom .= $_;
@@ -27,7 +27,6 @@ for ($i = 0; $i < $#seglat; $i++) {
 	$len[$i] = $d;
 	$seglen += $d;
 }
-print "$#seglat segs\n";
 
 open(IN, "joined");
 while (<IN>) {
@@ -48,7 +47,37 @@ close(IN);
 
 for ($i = 0; $i < $#seglat; $i++) {
 	for ($p = 0; $p < $len[$i]; $p += $step) {
-		$lat = $seglat[$i] * (1 - ($p / $len[$i])) + $seglat[$i] * ($p / $len[$i]);
-		$lon = $seglon[$i] * (1 - ($p / $len[$i])) + $seglon[$i] * ($p / $len[$i]);
+		$lat = $seglat[$i] * (1 - ($p / $len[$i])) + $seglat[$i + 1] * ($p / $len[$i]);
+		$lon = $seglon[$i] * (1 - ($p / $len[$i])) + $seglon[$i + 1] * ($p / $len[$i]);
+
+		$ilat = int($lat / $bucket);
+		$ilon = int($lon / $bucket);
+
+		%jobs_here = ();
+		%homes_here = ();
+
+		for ($aa = $ilat - 1; $aa <= $ilat + 1; $aa++) {
+			for ($oo = $ilon - 2; $oo <= $ilon + 2; $oo++) {
+				@b = @{$index{"$aa,$oo"}};
+
+				for ($j = 0; $j <= $#b; $j++) {
+					$latd = $lat - $lat{$b[$j]};
+					$lond = ($lon - $lon{$b[$j]}) * $rat;
+					$d = sqrt($latd * $latd + $lond * $lond) / $foot;
+
+					for $check (1320, 2640, 5280, 2 * 5280) {
+						if ($d < $check) {
+							$jobs_here{$check} += $jobs{$b[$j]};
+							$homes_here{$check} += $homes{$b[$j]};
+						}
+					}
+				}
+			}
+		}
+
+		for $check (1320, 2640, 5280, 2 * 5280) {
+			printf("%d %d ", $jobs_here{$check}, $homes_here{$check});
+		}
+		printf("\n");
 	}
 }
