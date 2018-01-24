@@ -6,8 +6,7 @@ In the style of http://caltrain-hsr.blogspot.com/2013/10/census-driven-service-p
 Download LODES for California:
 
 ```
-curl -L -O https://lehd.ces.census.gov/data/lodes/LODES7/ca/rac/ca_rac_S000_JT00_2015.csv.gz
-curl -L -O https://lehd.ces.census.gov/data/lodes/LODES7/ca/wac/ca_wac_S000_JT00_2015.csv.gz
+curl -L -O https://lehd.ces.census.gov/data/lodes/LODES7/ca/wac/ca_wac_S000_JT01_2015.csv.gz
 ```
 
 Download Census 2000 preliminary data, as the easiest source
